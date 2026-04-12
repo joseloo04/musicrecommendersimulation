@@ -10,6 +10,17 @@ venv/
 
 # OS files
 .DS_Store
+Thumbs.db
+desktop.ini
+
+# VSCode
+.vscode/
+
+# Conda
+.conda/
+
+# Jupyter
+.ipynb_checkpoints/
 
 # Pytest cache
 .pytest_cache/
