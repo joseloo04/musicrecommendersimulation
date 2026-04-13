@@ -1,5 +1,7 @@
 # 🎧 Model Card: Music Recommender Simulation
 
+[![Built with Claude](https://img.shields.io/badge/Built%20with-Claude%E2%84%A2-blueviolet?logo=anthropic&logoColor=white)](https://claude.ai/claude-code)
+
 ## 1. Model Name  
 
 Give your model a short, descriptive name.  

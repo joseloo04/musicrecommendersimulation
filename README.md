@@ -1,5 +1,7 @@
 # 🎵 Music Recommender Simulation
 
+[![Built with Claude](https://img.shields.io/badge/Built%20with-Claude%E2%84%A2-blueviolet?logo=anthropic&logoColor=white)](https://claude.ai/claude-code)
+
 ## Project Summary
 
 Waripolo Vicencio 2.2 is a content-based music recommender that scores every song 
