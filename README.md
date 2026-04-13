@@ -17,18 +17,58 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+Unlike collaborative filtering — which recommends songs based on what similar users liked — this system is **content-based**: it looks only at the attributes of the songs themselves and matches them against what the user explicitly prefers.
 
-Some prompts to answer:
+The system prioritizes **genre** and **mood** as the strongest signals of taste (weighted at 2.0 and 1.5 respectively), then fine-tunes the score using how close a song's energy and acousticness are to the user's targets. It is worth noting that heavily weighting genre introduces a bias: a wrong-genre song can almost never outscore a right-genre one, even if it matches everything else perfectly.
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+Keeping `target_acousticness` as a float rather than a simple yes/no boolean makes the scoring more nuanced — it lets the system tell the difference between a slightly acoustic indie track and a fully unplugged folk recording, which a boolean would treat identically.
 
-You can include a simple diagram or bullet list if helpful.
+Every song in the catalog is scored, sorted by score descending, and the top K results (default `K = 5`) are returned.
 
+### Song Features
+
+Each `Song` uses four primary features:
+
+| Feature | Type | Description |
+|---|---|---|
+| `genre` | categorical | Musical genre (e.g. lofi, pop, jazz) |
+| `mood` | categorical | Emotional feel (e.g. chill, happy, intense) |
+| `energy` | float 0–1 | How active or intense the song sounds |
+| `acousticness` | float 0–1 | How acoustic vs. electronic the song is |
+
+Optional bonus features (`valence`, `danceability`, `tempo_bpm`) are available in the dataset but not used in the primary scoring formula.
+
+### UserProfile
+
+A `UserProfile` stores the user's preferences across the same four dimensions:
+
+| Field | Type | Example |
+|---|---|---|
+| `favorite_genre` | string | `"lofi"` |
+| `favorite_mood` | string | `"chill"` |
+| `target_energy` | float 0–1 | `0.40` |
+| `target_acousticness` | float 0–1 | `0.75` |
+
+### Scoring Rule (one song at a time)
+
+Each song receives a score out of a maximum of **5.0**:
+
+```
++2.0  if song.genre == user.favorite_genre
++1.5  if song.mood == user.favorite_mood
++1.0 × (1 - |song.energy - user.target_energy|)
++0.5 × (1 - |song.acousticness - user.target_acousticness|)
+```
+
+Genre and mood are weighted highest because they are the strongest signals of user taste. Energy and acousticness use distance-based scoring — the closer the song is to the user's target, the higher the contribution.
+
+### Ranking Rule (whole catalog)
+
+1. Apply the scoring rule to every song in the catalog
+2. Sort all songs by score in descending order
+3. Return the top `k` songs (default: `k = 5`)
+
+![CLI Output](assets/output.png)
 ---
 
 ## Getting Started
