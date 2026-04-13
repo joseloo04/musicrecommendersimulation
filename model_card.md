@@ -3,109 +3,97 @@
 ## 1. Model Name  
 
 Give your model a short, descriptive name.  
-Example: **VibeMeter 1.223432.1**  
+Example: **Waripolo Vicencio 2.2**  
 
 ---
 
-## 2. Intended Use  
+## 2. Goal / Task
+VibeMatch picks the top 5 songs from an 18-song catalog based on a user's
+preferred genre, mood, energy level, and acousticness. Built for a classroom
+project — not production.
 
-Describe what your recommender is designed to do and who it is for. 
+## 3. Data Used
+- 18 songs in `data/songs.csv`
+- 10 features per song: id, title, artist, genre, mood, energy, tempo_bpm,
+  valence, danceability, acousticness
+- 15 genres: pop, lofi, rock, metal, classical, EDM, jazz, folk, soul, and more
+- I expanded the original 10-song dataset to 18 for more variety
+- Most genres have only 1 song; lofi and pop each have 2
 
-Prompts:  
+## 4. Algorithm Summary
+Every song gets a score against the user profile:
 
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+- +2.0 if genre matches
+- +1.5 if mood matches
+- Up to +1.0 based on energy closeness (exact match = full point)
+- Up to +0.5 based on acousticness closeness
 
----
+Max score is 5.0. Top 5 get returned.
 
-## 3. How the Model Works  
+## 5. Observed Behavior and Biases
 
-Explain your scoring approach in simple language.  
+- **Genre dominance:** Genre is 40% of the total score. A mediocre song in
+  the right genre will almost always beat a great song in the wrong one.
+- **Catalog imbalance:** Rock, metal, country, and folk each have one song.
+  After the #1 match, the system falls back to energy similarity from
+  completely different genres.
+- **Energy as false proxy:** A rock user got EDM and hip-hop in their top 5
+  because those songs happen to be high energy. Sounds nothing like rock.
+- **Conflicting preferences break down:** A pop/sad user kept getting intense
+  pop songs because the genre weight drowned out the mood signal.
+- **Input validation bug (fixed):** Values like energy: 1.4 used to produce
+  negative scores. Fixed with clamping to 0.0–1.0.
 
-Prompts:  
+## 6. Evaluation Process
+I tested five profiles:
 
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
+- Pop/Happy — Sunrise City scored 4.97/5.0, worked well
+- Chill Lofi — best results, two songs scored above 4.90
+- Intense Rock — strong #1, but positions #2-#5 were unrelated genres
+- Adversarial Pop/Sad — genre kept winning over mood
+- Adversarial Classical/Out-of-range — broke the scoring, exposed the bug
 
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+I also ran one experiment: doubled energy weight, halved genre weight.
+The rock user started getting EDM. That told me weights are not neutral
+math — they're decisions about what the system thinks matters.
 
----
+## 7. Intended and Non-Intended Use
 
-## 4. Data  
+**Use it for:**
+- Learning how content-based filtering works
+- Exploring how scoring weights affect bias and variety
 
-Describe the dataset the model uses.  
+**Don't use it for:**
+- Actual music recommendations
+- Any catalog larger than a toy dataset
+- Replacing Spotify
 
-Prompts:  
+## 8. Ideas for Improvement
+1. Learn weights from user feedback instead of hardcoding them
+2. At least 5 songs per genre so minority-genre users get real variety
+3. Add collaborative filtering — what did similar users actually enjoy
 
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+## 9. Personal Reflection
 
----
+The weight experiment was the moment things clicked. I doubled energy,
+halved genre, and suddenly a rock user was getting EDM recommendations.
+That's when I realized every number in a scoring function is a hidden
+assumption. Spotify doesn't hardcode those assumptions — it learns them
+from billions of plays, which is why it feels personal in a way mine can't.
 
-## 5. Strengths  
+Copilot was useful for the boring parts: CSV loading, terminal formatting,
+docstrings. But it burned me once. It generated a user profile with keys
+like `"genre"` instead of `"favorite_genre"`, which is what `score_song`
+actually checks. No error, no crash — just silently wrong results. That's
+the part nobody warns you about: AI-generated code can be syntactically
+fine and semantically broken at the same time.
 
-Where does your system seem to work well  
+The thing that genuinely surprised me was how satisfying it felt to see
+Sunrise City hit 4.97/5.0. I knew exactly why it happened. The math is
+right there. And it still felt like the system "got it right." I think
+that's the trick behind all recommendation systems — the output feels
+personal even when the process is completely mechanical.
 
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
-
----
-
-## 6. Limitations and Bias 
-
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
-
----
-
-## 7. Evaluation  
-
-How you checked whether the recommender behaved as expected. 
-
-Prompts:  
-
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
-
-No need for numeric metrics unless you created some.
-
----
-
-## 8. Future Work  
-
-Ideas for how you would improve the model next.  
-
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
-
----
-
-## 9. Personal Reflection  
-
-A few sentences about your experience.  
-
-Prompts:  
-
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+If I kept building this, I'd add a thumbs up/down loop so the weights
+could adjust over time. That's the gap between a rule-based system and
+something that actually learns.

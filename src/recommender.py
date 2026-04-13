@@ -80,14 +80,14 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
         reasons.append('mood match (+1.5)')
     
     # Energy proximity: +1.0 × (1 − |song['energy'] − user_prefs['target_energy']|)
-    target_energy = user_prefs.get('target_energy', 0.5)
+    target_energy = max(0.0, min(1.0, user_prefs.get('target_energy', 0.5)))
     energy_proximity = 1.0 * (1 - abs(song['energy'] - target_energy))
     energy_proximity_rounded = round(energy_proximity, 2)
     score += energy_proximity_rounded
     reasons.append(f'energy proximity (+{energy_proximity_rounded})')
     
     # Acousticness proximity: +0.5 × (1 − |song['acousticness'] − user_prefs['target_acousticness']|)
-    target_acousticness = user_prefs.get('target_acousticness', 0.5)
+    target_acousticness = max(0.0, min(1.0, user_prefs.get('target_acousticness', 0.5)))
     acousticness_proximity = 0.5 * (1 - abs(song['acousticness'] - target_acousticness))
     acousticness_proximity_rounded = round(acousticness_proximity, 2)
     score += acousticness_proximity_rounded
