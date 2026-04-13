@@ -1,3 +1,5 @@
+[![Built with Claude](https://img.shields.io/badge/Built%20with-Claude%E2%84%A2-blueviolet?logo=anthropic&logoColor=white)](https://claude.ai/claude-code)
+
 ## 2. Intended Use  
 
 Describe what your recommender is designed to do and who it is for. 
