@@ -17,14 +17,44 @@ def main() -> None:
     print(f"Loaded songs: {len(songs)}.")
 
     # Starter example profile
-    user_prefs = {
-    "favorite_genre": "pop",
-    "favorite_mood": "happy",
-    "target_energy": 0.8,
-    "target_acousticness": 0.2
-}
+    user_prefs_pop = {
+        "favorite_genre": "pop",
+        "favorite_mood": "happy",
+        "target_energy": 0.8,
+        "target_acousticness": 0.2
+    }
 
-    recommendations = recommend_songs(user_prefs, songs, k=5)
+    # Profile 2: Chill Lofi
+    user_prefs_lofi = {
+        "favorite_genre": "lofi",
+        "favorite_mood": "chill",
+        "target_energy": 0.4,
+        "target_acousticness": 0.75
+    }
+
+    # Profile 3: Intense Rock
+    user_prefs_rock = {
+        "favorite_genre": "rock",
+        "favorite_mood": "intense",
+        "target_energy": 0.9,
+        "target_acousticness": 0.1
+    }
+
+    adversarial_profile_conflict = {
+    "favorite_genre": "pop",
+    "favorite_mood": "sad",
+    "target_energy": 0.98,
+    "target_acousticness": 0.05
+    }
+
+    adversarial_profile_sparse_invalid = {
+        "favorite_genre": "classical",
+        "favorite_mood": "energetic",
+        "target_energy": 1.4,
+        "target_acousticness": -0.2
+    }
+
+    recommendations = recommend_songs(user_prefs_rock, songs, k=5)
 
     print("\nTop recommendations:\n")
     for idx, rec in enumerate(recommendations, 1):
